@@ -1,0 +1,2005 @@
+import gql from 'graphql-tag';
+import { cellTypes, dataFormatTypes } from '../bento-core';
+import {
+  customCasesTabDownloadCSV,
+  customFilesTabDownloadCSV,
+  customSamplesTabDownloadCSV,
+  customStudyFilesTabDownloadCSV,
+} from './tableDownloadCSV';
+
+// --------------- Tooltip configuration --------------
+export const tooltipContent = {
+  icon: 'https://raw.githubusercontent.com/CBIIT/datacommons-assets/main/icdc/images/svgs/Tooltip.SpeechBubble.svg',
+  alt: 'tooltipIcon',
+  Cases: 'Add filtered files associated with selected case(s) to My Files',
+  Samples: 'Add filtered files associated with selected sample(s) to My Files',
+  'Case Files': 'Add selected files to My Files',
+  'Study Files': 'Add selected files to My Files',
+  arrow: true,
+  clsName: 'addSelectedTooltip',
+};
+
+export const baseToolTipConfig = {
+  src: 'https://raw.githubusercontent.com/CBIIT/datacommons-assets/main/icdc/images/svgs/Tooltip.SpeechBubble.svg',
+  alt: 'tooltipIcon',
+  arrow: true,
+  clsName: 'addSelectedTooltip',
+};
+
+export const addFileTooltipText = {
+  case: {
+    addAllFilesText:
+      'Add filtered files associated with all cases in the current results set to My Files',
+    addSelectedFilesText:
+      'Add filtered files associated with selected case(s) to My Files',
+  },
+  sample: {
+    addAllFilesText:
+      'Add filtered files associated with all cases in the current results set to My Files',
+    addSelectedFilesText:
+      'Add filtered files associated with selected sample(s) to My Files',
+  },
+  caseFiles: {
+    addAllFilesText: 'Add all filtered files to My Files',
+    addSelectedFilesText: 'Add selected files to My Files',
+  },
+  studyFiles: {
+    addAllFilesText: 'Add all filtered files to My Files',
+    addSelectedFilesText: 'Add selected files to My Files',
+  },
+};
+
+// --------------- Tooltip configuration --------------
+export const selectAllToolTip = {
+  icon: 'https://raw.githubusercontent.com/CBIIT/datacommons-assets/main/icdc/images/svgs/Tooltip.SpeechBubble.svg',
+  alt: 'tooltipIcon',
+  arrow: true,
+  clsName: 'addAllTooltip',
+  Cases:
+    'Add filtered files associated with all cases in the current results set to My Files',
+  Samples:
+    'Add filtered files associated with all samples in the current results set to My Files',
+  'Case Files': 'Add all filtered files to My Files',
+  'Study Files': 'Add all filtered files to My Files',
+};
+
+export const selectAllButtonText = {
+  Cases: 'Add filtered files associated with all cases to My Files',
+  Samples: 'Add filtered files associated with all samples to My Files',
+  'Case Files': 'Add all filtered files to My Files',
+  'Study Files': 'Add all filtered study files to My Files',
+  arrow: true,
+  clsName: 'addAllTooltip',
+};
+// --------------- Dahboard Table external link configuration --------------
+// Ideal size for externalLinkIcon is 16x16 px
+export const externalLinkIcon = {
+  src: 'https://raw.githubusercontent.com/CBIIT/bento-frontend/master/src/assets/program/externalLinkIcon.svg',
+  alt: 'External link icon',
+};
+
+export const multiStudyData = {
+  icon: 'https://raw.githubusercontent.com/CBIIT/datacommons-assets/main/icdc/images/svgs/icon-multiStudy.svg',
+  alt: 'Multi-study icon',
+  toolTipText: 'Multi-study participant also enrolled as:',
+};
+
+export const fileViewer = {
+  icon: 'https://raw.githubusercontent.com/CBIIT/datacommons-assets/main/icdc/images/svgs/DocumentDownloadBAM.svg',
+  alt: 'file viewer icon',
+  toolTipText: 'View in JBrowse',
+};
+
+// --------------- Tabs Header Data configuration --------------
+export const tabs = [
+  {
+    id: 'case_tab',
+    title: 'Cases',
+    dataField: 'dataCase',
+    count: 'numberOfCases',
+  },
+  {
+    id: 'sample_tab',
+    title: 'Samples',
+    dataField: 'dataSample',
+    count: 'numberOfSamples',
+  },
+  {
+    id: 'file_tab',
+    title: 'Case Files',
+    dataField: 'dataFile',
+    count: 'numberOfFiles',
+  },
+  {
+    id: 'study_file_tab',
+    title: 'Study Files',
+    dataField: 'dataFile',
+    count: 'numberOfStudyFiles',
+  },
+];
+
+// --------------- Tabs Header Style configuration --------------
+export const tabIndex = [
+  {
+    title: 'Cases',
+    primaryColor: '#FF9742',
+    secondaryColor: '#FFDFB8',
+    selectedColor: '#FF9742',
+  },
+  {
+    title: 'Samples',
+    primaryColor: '#9DC1D9',
+    secondaryColor: '#C9F1F1',
+    selectedColor: '#9DC1D9',
+  },
+  {
+    title: 'Files',
+    primaryColor: '#667A87',
+    secondaryColor: '#E1E5FF',
+    selectedColor: '#667A87',
+  },
+  {
+    title: 'Study Files',
+    primaryColor: '#39C0F0',
+    secondaryColor: '#39C0F0',
+    selectedColor: '#39C0F0',
+  },
+];
+
+export const DASHBOARD_QUERY = gql`
+  query dashboardSearchQuery(
+    $program: [String] = []
+    $study: [String]
+    $study_type: [String]
+    $breed: [String]
+    $diagnosis: [String]
+    $disease_site: [String]
+    $stage_of_disease: [String]
+    $response_to_treatment: [String]
+    $sex: [String]
+    $neutered_status: [String]
+    $sample_type: [String]
+    $sample_pathology: [String]
+    $sample_site: [String]
+    $file_association: [String]
+    $file_type: [String]
+    $file_format: [String]
+    $biobank: [String]
+    $study_participation: [String]
+    $case_ids: [String] = []
+    $search_text: String = ""
+  ) {
+    dashboard: searchCases(
+      program: $program
+      study: $study
+      study_type: $study_type
+      breed: $breed
+      diagnosis: $diagnosis
+      disease_site: $disease_site
+      stage_of_disease: $stage_of_disease
+      response_to_treatment: $response_to_treatment
+      sex: $sex
+      neutered_status: $neutered_status
+      sample_type: $sample_type
+      sample_pathology: $sample_pathology
+      sample_site: $sample_site
+      file_association: $file_association
+      file_type: $file_type
+      file_format: $file_format
+      biobank: $biobank
+      study_participation: $study_participation
+      case_ids: $case_ids
+    ) {
+      numberOfStudies
+      numberOfCases
+      numberOfSamples
+      numberOfFiles
+      numberOfStudyFiles
+      numberOfPrograms
+      numberOfAliquots
+      volumeOfData
+      caseIds
+      sampleIds
+      fileIds
+      studyFileIds
+
+      caseCountByDiagnosis {
+        group
+        count
+      }
+      caseCountByGender {
+        group
+        count
+      }
+      caseCountByBreed {
+        group
+        count
+      }
+      caseCountByStageOfDisease {
+        group
+        count
+      }
+      caseCountByDiseaseSite {
+        group
+        count
+      }
+      filterCaseCountByProgram {
+        group
+        count
+      }
+      filterCaseCountByStudyCode {
+        group
+        count
+      }
+      filterCaseCountByStudyType {
+        group
+        count
+      }
+      filterCaseCountByBreed {
+        group
+        count
+      }
+      filterCaseCountByDiagnosis {
+        group
+        count
+      }
+      filterCaseCountByDiseaseSite {
+        group
+        count
+      }
+      filterCaseCountByStageOfDisease {
+        group
+        count
+      }
+      filterCaseCountByResponseToTreatment {
+        group
+        count
+      }
+      filterCaseCountBySex {
+        group
+        count
+      }
+      filterCaseCountByNeuteredStatus {
+        group
+        count
+      }
+      filterCaseCountBySampleType {
+        group
+        count
+      }
+      filterCaseCountBySamplePathology {
+        group
+        count
+      }
+      filterCaseCountBySampleSite {
+        group
+        count
+      }
+      filterCaseCountByFileAssociation {
+        group
+        count
+      }
+      filterCaseCountByFileType {
+        group
+        count
+      }
+      filterCaseCountByBiobank {
+        group
+        count
+      }
+      filterCaseCountByStudyParticipation {
+        group
+        count
+      }
+      filterCaseCountByFileFormat {
+        group
+        count
+      }
+      programsAndStudies {
+        program
+        caseSize
+        studies {
+          study
+          caseSize
+        }
+      }
+    }
+    searchTextResults: searchCases(
+      program: $program
+      study: $study
+      study_type: $study_type
+      breed: $breed
+      diagnosis: $diagnosis
+      disease_site: $disease_site
+      stage_of_disease: $stage_of_disease
+      response_to_treatment: $response_to_treatment
+      sex: $sex
+      neutered_status: $neutered_status
+      sample_type: $sample_type
+      sample_pathology: $sample_pathology
+      sample_site: $sample_site
+      file_association: $file_association
+      file_type: $file_type
+      file_format: $file_format
+      biobank: $biobank
+      study_participation: $study_participation
+      case_ids: $case_ids
+      search_text: $search_text
+    ) {
+      numberOfCases
+      numberOfSamples
+      numberOfFiles
+      numberOfStudyFiles
+      caseIds
+      sampleIds
+      fileIds
+      studyFileIds
+    }
+
+    biospecimen_source: biospecimen_source {
+      biospecimen_repository_acronym
+      biospecimen_repository_full_name
+    }
+
+    program: program {
+      program_acronym
+      program_name
+    }
+  }
+`;
+
+// --------------- GraphQL query - Retrieve files tab details --------------
+export const GET_FILES_NAME_QUERY = gql`
+  query getFileName(
+    $file_level: [String] = []
+    $program: [String] = []
+    $study: [String]
+    $study_type: [String]
+    $breed: [String]
+    $diagnosis: [String]
+    $disease_site: [String]
+    $stage_of_disease: [String]
+    $response_to_treatment: [String]
+    $sex: [String]
+    $neutered_status: [String]
+    $sample_type: [String]
+    $sample_pathology: [String]
+    $sample_site: [String]
+    $file_association: [String]
+    $file_type: [String]
+    $file_format: [String]
+    $biobank: [String]
+    $study_participation: [String]
+    $order_by: String = "file_name"
+    $sort_direction: String = "ASC"
+    $first: Int = 10
+    $offset: Int = 0
+  ) {
+    fileOverview(
+      file_level: $file_level
+      program: $program
+      study: $study
+      study_type: $study_type
+      breed: $breed
+      diagnosis: $diagnosis
+      disease_site: $disease_site
+      stage_of_disease: $stage_of_disease
+      response_to_treatment: $response_to_treatment
+      sex: $sex
+      neutered_status: $neutered_status
+      sample_type: $sample_type
+      sample_pathology: $sample_pathology
+      sample_site: $sample_site
+      file_association: $file_association
+      file_type: $file_type
+      file_format: $file_format
+      biobank: $biobank
+      study_participation: $study_participation
+      order_by: $order_by
+      sort_direction: $sort_direction
+      first: $first
+      offset: $offset
+    ) {
+      file_name
+    }
+  }
+`;
+
+export const FILTER_QUERY = gql`
+  query searchCases(
+    $program: [String] = []
+    $study: [String]
+    $study_type: [String]
+    $breed: [String]
+    $diagnosis: [String]
+    $disease_site: [String]
+    $stage_of_disease: [String]
+    $response_to_treatment: [String]
+    $sex: [String]
+    $neutered_status: [String]
+    $sample_type: [String]
+    $sample_pathology: [String]
+    $sample_site: [String]
+    $file_association: [String]
+    $file_type: [String]
+    $file_format: [String]
+    $biobank: [String]
+    $study_participation: [String]
+  ) {
+    searchCases(
+      program: $program
+      study: $study
+      study_type: $study_type
+      breed: $breed
+      diagnosis: $diagnosis
+      disease_site: $disease_site
+      stage_of_disease: $stage_of_disease
+      response_to_treatment: $response_to_treatment
+      sex: $sex
+      neutered_status: $neutered_status
+      sample_type: $sample_type
+      sample_pathology: $sample_pathology
+      sample_site: $sample_site
+      file_association: $file_association
+      file_type: $file_type
+      file_format: $file_format
+      biobank: $biobank
+      study_participation: $study_participation
+    ) {
+      numberOfStudies
+      numberOfCases
+      numberOfSamples
+      numberOfFiles
+      numberOfStudyFiles
+      numberOfPrograms
+      numberOfAliquots
+      volumeOfData
+      caseCountByDiagnosis {
+        group
+        count
+      }
+      caseCountByGender {
+        group
+        count
+      }
+      caseCountByBreed {
+        group
+        count
+      }
+      caseCountByStageOfDisease {
+        group
+        count
+      }
+      caseCountByDiseaseSite {
+        group
+        count
+      }
+
+      filterCaseCountByProgram {
+        group
+        count
+      }
+      filterCaseCountByStudyCode {
+        group
+        count
+      }
+      filterCaseCountByStudyType {
+        group
+        count
+      }
+      filterCaseCountByBreed {
+        group
+        count
+      }
+      filterCaseCountByDiagnosis {
+        group
+        count
+      }
+      filterCaseCountByDiseaseSite {
+        group
+        count
+      }
+      filterCaseCountByStageOfDisease {
+        group
+        count
+      }
+      filterCaseCountByResponseToTreatment {
+        group
+        count
+      }
+      filterCaseCountBySex {
+        group
+        count
+      }
+      filterCaseCountByNeuteredStatus {
+        group
+        count
+      }
+      filterCaseCountBySampleType {
+        group
+        count
+      }
+      filterCaseCountBySamplePathology {
+        group
+        count
+      }
+      filterCaseCountBySampleSite {
+        group
+        count
+      }
+      filterCaseCountByFileAssociation {
+        group
+        count
+      }
+      filterCaseCountByFileType {
+        group
+        count
+      }
+      filterCaseCountByFileFormat {
+        group
+        count
+      }
+      filterCaseCountByBiobank {
+        group
+        count
+      }
+      filterCaseCountByStudyParticipation {
+        group
+        count
+      }
+      programsAndStudies {
+        program
+        caseSize
+        studies {
+          study
+          caseSize
+        }
+      }
+    }
+  }
+`;
+
+// --------------- GraphQL query - Retrieve files tab details --------------
+export const GET_FILES_OVERVIEW_QUERY = gql`
+  query getFilesOverview(
+    $file_level: [String] = []
+    $case_ids: [String] = []
+    $file_uuids: [String] = []
+    $program: [String] = []
+    $study: [String]
+    $study_type: [String]
+    $breed: [String]
+    $diagnosis: [String]
+    $disease_site: [String]
+    $stage_of_disease: [String]
+    $response_to_treatment: [String]
+    $sex: [String]
+    $neutered_status: [String]
+    $sample_type: [String]
+    $sample_pathology: [String]
+    $sample_site: [String]
+    $file_association: [String]
+    $file_type: [String]
+    $file_format: [String]
+    $biobank: [String]
+    $study_participation: [String]
+    $order_by: String = "file_name"
+    $sort_direction: String = "ASC"
+    $first: Int = 10
+    $offset: Int = 0
+  ) {
+    fileOverview(
+      file_level: $file_level
+      case_ids: $case_ids
+      file_uuids: $file_uuids
+      program: $program
+      study: $study
+      study_type: $study_type
+      breed: $breed
+      diagnosis: $diagnosis
+      disease_site: $disease_site
+      stage_of_disease: $stage_of_disease
+      response_to_treatment: $response_to_treatment
+      sex: $sex
+      neutered_status: $neutered_status
+      sample_type: $sample_type
+      sample_pathology: $sample_pathology
+      sample_site: $sample_site
+      file_association: $file_association
+      file_type: $file_type
+      file_format: $file_format
+      biobank: $biobank
+      study_participation: $study_participation
+      order_by: $order_by
+      sort_direction: $sort_direction
+      first: $first
+      offset: $offset
+    ) {
+      file_name
+      file_type
+      association
+      file_description
+      file_format
+      file_size
+      case_id
+      breed
+      diagnosis
+      study_code
+      file_uuid
+      sample_id
+      sample_site
+      physical_sample_type
+      general_sample_pathology
+      tumor_sample_origin
+      summarized_sample_type
+      specific_sample_pathology
+      date_of_sample_collection
+      tumor_grade
+      sample_chronology
+      percentage_tumor
+      necropsy_sample
+      sample_preservation
+      comment
+      individual_id
+      patient_age_at_enrollment
+      sex
+      neutered_indicator
+      weight
+      primary_disease_site
+      stage_of_disease
+      date_of_diagnosis
+      histology_cytopathology
+      histological_grade
+      best_response
+      pathology_report
+      treatment_data
+      follow_up_data
+      concurrent_disease
+      concurrent_disease_type
+      cohort_description
+      arm
+      other_cases
+    }
+  }
+`;
+
+export const GET_FILES_OVERVIEW_DESC_QUERY = gql`
+  query getFileOverviewDesc(
+    $file_level: [String] = []
+    $program: [String] = []
+    $study: [String]
+    $study_type: [String]
+    $breed: [String]
+    $diagnosis: [String]
+    $disease_site: [String]
+    $stage_of_disease: [String]
+    $response_to_treatment: [String]
+    $sex: [String]
+    $neutered_status: [String]
+    $sample_type: [String]
+    $sample_pathology: [String]
+    $sample_site: [String]
+    $file_association: [String]
+    $file_type: [String]
+    $file_format: [String]
+    $biobank: [String]
+    $study_participation: [String]
+    $order_by: String = "file_name"
+    $sort_direction: String = "DESC"
+    $first: Int = 10
+    $offset: Int = 0
+  ) {
+    fileOverview(
+      file_level: $file_level
+      program: $program
+      study: $study
+      study_type: $study_type
+      breed: $breed
+      diagnosis: $diagnosis
+      disease_site: $disease_site
+      stage_of_disease: $stage_of_disease
+      response_to_treatment: $response_to_treatment
+      sex: $sex
+      neutered_status: $neutered_status
+      sample_type: $sample_type
+      sample_pathology: $sample_pathology
+      sample_site: $sample_site
+      file_association: $file_association
+      file_type: $file_type
+      file_format: $file_format
+      biobank: $biobank
+      study_participation: $study_participation
+      order_by: $order_by
+      sort_direction: $sort_direction
+      first: $first
+      offset: $offset
+    ) {
+      file_name
+      file_type
+      association
+      file_description
+      file_format
+      file_size
+      case_id
+      breed
+      diagnosis
+      study_code
+      file_uuid
+      sample_id
+      sample_site
+      physical_sample_type
+      general_sample_pathology
+      tumor_sample_origin
+      summarized_sample_type
+      specific_sample_pathology
+      date_of_sample_collection
+      tumor_grade
+      sample_chronology
+      percentage_tumor
+      necropsy_sample
+      sample_preservation
+      comment
+      individual_id
+      patient_age_at_enrollment
+      sex
+      neutered_indicator
+      weight
+      primary_disease_site
+      stage_of_disease
+      date_of_diagnosis
+      histology_cytopathology
+      histological_grade
+      best_response
+      pathology_report
+      treatment_data
+      follow_up_data
+      concurrent_disease
+      concurrent_disease_type
+      cohort_description
+      arm
+      other_cases
+    }
+  }
+`;
+
+// --------------- GraphQL query - Retrieve sample tab details --------------
+export const GET_SAMPLES_OVERVIEW_QUERY = gql`
+  query getSampleOverview(
+    $case_ids: [String] = []
+    $sample_ids: [String] = []
+    $program: [String] = []
+    $study: [String]
+    $study_type: [String]
+    $breed: [String]
+    $diagnosis: [String]
+    $disease_site: [String]
+    $stage_of_disease: [String]
+    $response_to_treatment: [String]
+    $sex: [String]
+    $neutered_status: [String]
+    $sample_type: [String]
+    $sample_pathology: [String]
+    $sample_site: [String]
+    $file_association: [String]
+    $file_type: [String]
+    $file_format: [String]
+    $biobank: [String]
+    $study_participation: [String]
+    $order_by: String = "sample_ids"
+    $sort_direction: String = "ASC"
+    $first: Int = 10
+    $offset: Int = 0
+  ) {
+    sampleOverview(
+      case_ids: $case_ids
+      sample_ids: $sample_ids
+      program: $program
+      study: $study
+      study_type: $study_type
+      breed: $breed
+      diagnosis: $diagnosis
+      disease_site: $disease_site
+      stage_of_disease: $stage_of_disease
+      response_to_treatment: $response_to_treatment
+      sex: $sex
+      neutered_status: $neutered_status
+      sample_type: $sample_type
+      sample_pathology: $sample_pathology
+      sample_site: $sample_site
+      file_association: $file_association
+      file_type: $file_type
+      file_format: $file_format
+      biobank: $biobank
+      study_participation: $study_participation
+      order_by: $order_by
+      sort_direction: $sort_direction
+      first: $first
+      offset: $offset
+    ) {
+      sample_id
+      case_id
+      breed
+      diagnosis
+      sample_site
+      sample_type
+      sample_pathology
+      tumor_grade
+      sample_chronology
+      percentage_tumor
+      necropsy_sample
+      sample_preservation
+      files
+      physical_sample_type
+      general_sample_pathology
+      tumor_sample_origin
+      comment
+      individual_id
+      other_cases
+      patient_age_at_enrollment
+      sex
+      neutered_indicator
+      weight
+      primary_disease_site
+      stage_of_disease
+      date_of_diagnosis
+      histology_cytopathology
+      histological_grade
+      best_response
+      pathology_report
+      treatment_data
+      follow_up_data
+      concurrent_disease
+      concurrent_disease_type
+      cohort_description
+      arm
+    }
+  }
+`;
+
+// --------------- GraphQL query - Retrieve sample tab details --------------
+
+export const GET_SAMPLES_OVERVIEW_DESC_QUERY = gql`
+  query getSamplesOverviewDescQuery(
+    $program: [String] = []
+    $study: [String]
+    $study_type: [String]
+    $breed: [String]
+    $diagnosis: [String]
+    $disease_site: [String]
+    $stage_of_disease: [String]
+    $response_to_treatment: [String]
+    $sex: [String]
+    $neutered_status: [String]
+    $sample_type: [String]
+    $sample_pathology: [String]
+    $sample_site: [String]
+    $file_association: [String]
+    $file_type: [String]
+    $file_format: [String]
+    $biobank: [String]
+    $study_participation: [String]
+    $order_by: String = "sample_ids"
+    $sort_direction: String = "DESC"
+    $first: Int = 10
+    $offset: Int = 0
+  ) {
+    sampleOverview(
+      program: $program
+      study: $study
+      study_type: $study_type
+      breed: $breed
+      diagnosis: $diagnosis
+      disease_site: $disease_site
+      stage_of_disease: $stage_of_disease
+      response_to_treatment: $response_to_treatment
+      sex: $sex
+      neutered_status: $neutered_status
+      sample_type: $sample_type
+      sample_pathology: $sample_pathology
+      sample_site: $sample_site
+      file_association: $file_association
+      file_type: $file_type
+      file_format: $file_format
+      biobank: $biobank
+      study_participation: $study_participation
+      order_by: $order_by
+      sort_direction: $sort_direction
+      first: $first
+      offset: $offset
+    ) {
+      sample_id
+      case_id
+      breed
+      diagnosis
+      sample_site
+      sample_type
+      sample_pathology
+      tumor_grade
+      sample_chronology
+      percentage_tumor
+      necropsy_sample
+      sample_preservation
+      files
+      physical_sample_type
+      general_sample_pathology
+      tumor_sample_origin
+      comment
+      individual_id
+      other_cases
+      patient_age_at_enrollment
+      sex
+      neutered_indicator
+      weight
+      primary_disease_site
+      stage_of_disease
+      date_of_diagnosis
+      histology_cytopathology
+      histological_grade
+      best_response
+      pathology_report
+      treatment_data
+      follow_up_data
+      concurrent_disease
+      concurrent_disease_type
+      cohort_description
+      arm
+    }
+  }
+`;
+
+// --------------- GraphQL query - Retrieve sample tab details --------------
+
+export const GET_CASES_OVERVIEW_QUERY = gql`
+  query getCasesOverviewQueryDashboardTab(
+    $case_ids: [String] = []
+    $program: [String] = []
+    $study: [String]
+    $study_type: [String]
+    $breed: [String]
+    $diagnosis: [String]
+    $disease_site: [String]
+    $stage_of_disease: [String]
+    $response_to_treatment: [String]
+    $sex: [String]
+    $neutered_status: [String]
+    $sample_type: [String]
+    $sample_pathology: [String]
+    $sample_site: [String]
+    $file_association: [String]
+    $file_type: [String]
+    $file_format: [String]
+    $biobank: [String]
+    $study_participation: [String]
+    $order_by: String = "case_id"
+    $sort_direction: String = "ASC"
+    $first: Int = 15
+    $offset: Int = 0
+  ) {
+    caseOverview(
+      program: $program
+      study: $study
+      study_type: $study_type
+      breed: $breed
+      diagnosis: $diagnosis
+      disease_site: $disease_site
+      stage_of_disease: $stage_of_disease
+      response_to_treatment: $response_to_treatment
+      sex: $sex
+      neutered_status: $neutered_status
+      sample_type: $sample_type
+      sample_pathology: $sample_pathology
+      sample_site: $sample_site
+      file_association: $file_association
+      file_type: $file_type
+      file_format: $file_format
+      biobank: $biobank
+      study_participation: $study_participation
+      order_by: $order_by
+      sort_direction: $sort_direction
+      first: $first
+      offset: $offset
+      case_ids: $case_ids
+    ) {
+      case_id
+      study_code
+      study_type
+      cohort
+      breed
+      diagnosis
+      stage_of_disease
+      age
+      sex
+      neutered_status
+      weight
+      response_to_treatment
+      disease_site
+      files
+      other_cases
+      individual_id
+      primary_disease_site
+      date_of_diagnosis
+      histology_cytopathology
+      histological_grade
+      pathology_report
+      treatment_data
+      follow_up_data
+      concurrent_disease
+      concurrent_disease_type
+      arm
+    }
+  }
+`;
+// --------------- GraphQL query - Retrieve sample tab details --------------
+
+export const GET_CASES_OVERVIEW_DESC_QUERY = gql`
+  query getCasesOverviewDescQuery(
+    $program: [String] = []
+    $study: [String]
+    $study_type: [String]
+    $breed: [String]
+    $diagnosis: [String]
+    $disease_site: [String]
+    $stage_of_disease: [String]
+    $response_to_treatment: [String]
+    $sex: [String]
+    $neutered_status: [String]
+    $sample_type: [String]
+    $sample_pathology: [String]
+    $sample_site: [String]
+    $file_association: [String]
+    $file_type: [String]
+    $file_format: [String]
+    $biobank: [String]
+    $study_participation: [String]
+    $order_by: String = "case_id"
+    $sort_direction: String = "DESC"
+    $first: Int = 10
+    $offset: Int = 0
+  ) {
+    caseOverview(
+      program: $program
+      study: $study
+      study_type: $study_type
+      breed: $breed
+      diagnosis: $diagnosis
+      disease_site: $disease_site
+      stage_of_disease: $stage_of_disease
+      response_to_treatment: $response_to_treatment
+      sex: $sex
+      neutered_status: $neutered_status
+      sample_type: $sample_type
+      sample_pathology: $sample_pathology
+      sample_site: $sample_site
+      file_association: $file_association
+      file_type: $file_type
+      file_format: $file_format
+      biobank: $biobank
+      study_participation: $study_participation
+      order_by: $order_by
+      sort_direction: $sort_direction
+      first: $first
+      offset: $offset
+    ) {
+      case_id
+      study_code
+      study_type
+      cohort
+      breed
+      diagnosis
+      stage_of_disease
+      age
+      sex
+      neutered_status
+      weight
+      response_to_treatment
+      disease_site
+      files
+      other_cases
+      individual_id
+      primary_disease_site
+      date_of_diagnosis
+      histology_cytopathology
+      histological_grade
+      pathology_report
+      treatment_data
+      follow_up_data
+      concurrent_disease
+      concurrent_disease_type
+      arm
+    }
+  }
+`;
+
+export const GET_ALL_FILEIDS_CASESTAB_FOR_SELECT_ALL = gql`
+  query caseOverview(
+    $case_ids: [String] = []
+    $program: [String] = []
+    $study: [String]
+    $study_type: [String]
+    $breed: [String]
+    $diagnosis: [String]
+    $disease_site: [String]
+    $stage_of_disease: [String]
+    $response_to_treatment: [String]
+    $sex: [String]
+    $neutered_status: [String]
+    $sample_type: [String]
+    $sample_pathology: [String]
+    $sample_site: [String]
+    $file_association: [String]
+    $file_type: [String]
+    $file_format: [String]
+    $biobank: [String]
+    $study_participation: [String]
+    $order_by: String = "case_id"
+    $sort_direction: String = "ASC"
+    $first: Int = 10
+    $offset: Int = 0
+  ) {
+    caseOverview(
+      case_ids: $case_ids
+      program: $program
+      study: $study
+      study_type: $study_type
+      breed: $breed
+      diagnosis: $diagnosis
+      disease_site: $disease_site
+      stage_of_disease: $stage_of_disease
+      response_to_treatment: $response_to_treatment
+      sex: $sex
+      neutered_status: $neutered_status
+      sample_type: $sample_type
+      sample_pathology: $sample_pathology
+      sample_site: $sample_site
+      file_association: $file_association
+      file_type: $file_type
+      file_format: $file_format
+      biobank: $biobank
+      study_participation: $study_participation
+      order_by: $order_by
+      sort_direction: $sort_direction
+      first: $first
+      offset: $offset
+    ) {
+      files
+    }
+  }
+`;
+
+export const GET_ALL_FILEIDS_SAMPLESTAB_FOR_SELECT_ALL = gql`
+  query getAllFileIdsForSampleTabForSelectAll(
+    $case_ids: [String] = []
+    $sample_ids: [String] = []
+    $program: [String] = []
+    $study: [String]
+    $study_type: [String]
+    $breed: [String]
+    $diagnosis: [String]
+    $disease_site: [String]
+    $stage_of_disease: [String]
+    $response_to_treatment: [String]
+    $sex: [String]
+    $neutered_status: [String]
+    $sample_type: [String]
+    $sample_pathology: [String]
+    $sample_site: [String]
+    $file_association: [String]
+    $file_type: [String]
+    $file_format: [String]
+    $biobank: [String]
+    $study_participation: [String]
+    $order_by: String = "sample_ids"
+    $sort_direction: String = "ASC"
+    $first: Int = 10
+    $offset: Int = 0
+  ) {
+    sampleOverview(
+      case_ids: $case_ids
+      sample_ids: $sample_ids
+      program: $program
+      study: $study
+      study_type: $study_type
+      breed: $breed
+      diagnosis: $diagnosis
+      disease_site: $disease_site
+      stage_of_disease: $stage_of_disease
+      response_to_treatment: $response_to_treatment
+      sex: $sex
+      neutered_status: $neutered_status
+      sample_type: $sample_type
+      sample_pathology: $sample_pathology
+      sample_site: $sample_site
+      file_association: $file_association
+      file_type: $file_type
+      file_format: $file_format
+      biobank: $biobank
+      study_participation: $study_participation
+      order_by: $order_by
+      sort_direction: $sort_direction
+      first: $first
+      offset: $offset
+    ) {
+      files
+    }
+  }
+`;
+
+export const GET_ALL_FILEIDS_FILESTAB_FOR_SELECT_ALL = gql`
+  query getAllFileIdsDashboardTab(
+    $file_level: [String] = []
+    $case_ids: [String] = []
+    $file_uuids: [String] = []
+    $sample_ids: [String] = []
+    $program: [String] = []
+    $study: [String]
+    $study_type: [String]
+    $breed: [String]
+    $diagnosis: [String]
+    $disease_site: [String]
+    $stage_of_disease: [String]
+    $response_to_treatment: [String]
+    $sex: [String]
+    $neutered_status: [String]
+    $sample_type: [String]
+    $sample_pathology: [String]
+    $sample_site: [String]
+    $file_association: [String]
+    $file_type: [String]
+    $file_format: [String]
+    $biobank: [String]
+    $study_participation: [String]
+    $order_by: String = "file_name"
+    $sort_direction: String = "ASC"
+    $first: Int = 10
+    $offset: Int = 0
+  ) {
+    fileOverview(
+      file_level: $file_level
+      case_ids: $case_ids
+      sample_ids: $sample_ids
+      file_uuids: $file_uuids
+      program: $program
+      study: $study
+      study_type: $study_type
+      breed: $breed
+      diagnosis: $diagnosis
+      disease_site: $disease_site
+      stage_of_disease: $stage_of_disease
+      response_to_treatment: $response_to_treatment
+      sex: $sex
+      neutered_status: $neutered_status
+      sample_type: $sample_type
+      sample_pathology: $sample_pathology
+      sample_site: $sample_site
+      file_association: $file_association
+      file_type: $file_type
+      file_format: $file_format
+      biobank: $biobank
+      study_participation: $study_participation
+      order_by: $order_by
+      sort_direction: $sort_direction
+      first: $first
+      offset: $offset
+    ) {
+      file_uuid
+    }
+  }
+`;
+
+export const GET_ALL_FILEIDS_SAMPLE_TAB_FOR_SELECT_ALL = gql`
+  query getAllFiledsForSampleTabForSelectAll(
+    $file_level: [String] = []
+    $case_ids: [String] = []
+    $sample_ids: [String] = []
+    $program: [String] = []
+    $study: [String]
+    $study_type: [String]
+    $breed: [String]
+    $diagnosis: [String]
+    $disease_site: [String]
+    $stage_of_disease: [String]
+    $response_to_treatment: [String]
+    $sex: [String]
+    $neutered_status: [String]
+    $sample_type: [String]
+    $sample_pathology: [String]
+    $sample_site: [String]
+    $file_type: [String]
+    $file_format: [String]
+    $biobank: [String]
+    $study_participation: [String]
+    $order_by: String = "file_name"
+    $sort_direction: String = "ASC"
+    $first: Int = 10
+    $offset: Int = 0
+  ) {
+    fileOverview(
+      file_level: $file_level
+      case_ids: $case_ids
+      sample_ids: $sample_ids
+      program: $program
+      study: $study
+      study_type: $study_type
+      breed: $breed
+      diagnosis: $diagnosis
+      disease_site: $disease_site
+      stage_of_disease: $stage_of_disease
+      response_to_treatment: $response_to_treatment
+      sex: $sex
+      neutered_status: $neutered_status
+      sample_type: $sample_type
+      sample_pathology: $sample_pathology
+      sample_site: $sample_site
+      file_association: ["sample"]
+      file_type: $file_type
+      file_format: $file_format
+      biobank: $biobank
+      study_participation: $study_participation
+      order_by: $order_by
+      sort_direction: $sort_direction
+      first: $first
+      offset: $offset
+    ) {
+      file_uuid
+    }
+  }
+`;
+
+export const GET_FILE_IDS_FROM_FILE_NAME = gql`
+  query getFileIdsFromFileName(
+    $file_name: [String]
+    $offset: Int
+    $first: Int
+    $order_by: String
+  ) {
+    fileIdsFromFileNameDesc(
+      file_name: $file_name
+      offset: $offset
+      first: $first
+      order_by: $order_by
+    ) {
+      file_uuid
+    }
+  }
+`;
+
+export const GET_ALL_FILEIDS_ON_FILESTAB_FOR_SELECT_ALL = gql`
+  query getAllFileIdsOnFileTabForSelectAll($file_name: [String]) {
+    fileIdsFromFileName(file_name: $file_name) {
+      file_uuid
+    }
+  }
+`;
+
+export const GET_STUDY_CODE = gql`
+  query getStudyCode($clinical_study_designation: String) {
+    study(clinical_study_designation: $clinical_study_designation) {
+      clinical_study_designation
+      accession_id
+    }
+  }
+`;
+
+// --------------- Tabs Table configuration --------------
+export const tableContainers = [
+  {
+    name: 'Cases',
+    title: 'case',
+    dataField: 'dataCase',
+    api: GET_CASES_OVERVIEW_QUERY,
+    selectAllButtonText: 'Add Files for All Cases',
+    selectedButtonText: 'Add Files for Selected Cases',
+    paginationAPIField: 'caseOverview',
+    count: 'numberOfCases',
+    tableCount: 'numberOfTextFilteredCases',
+    dataKey: 'case_id',
+    defaultSortField: 'case_id',
+    defaultSortDirection: 'asc',
+    searchTextRequestKey: 'case_ids',
+    searchTextResultKey: 'caseIds',
+    extendedViewConfig: {
+      searchInput: true,
+      pagination: true,
+      download: {
+        customDownload: true,
+        downloadCsv: 'Download Table Contents As CSV',
+        ...customCasesTabDownloadCSV,
+      },
+      manageViewColumns: {
+        title: 'View Columns',
+      },
+    },
+    columns: [
+      {
+        cellType: cellTypes.CHECKBOX,
+        display: true,
+        role: cellTypes.CHECKBOX,
+      },
+      {
+        dataField: 'case_id',
+        header: 'Case ID',
+        sort: 'asc',
+        primary: true,
+        display: true,
+        cellType: cellTypes.CUSTOM_ELEM,
+        linkAttr: {
+          rootPath: '/case',
+          pathParams: ['case_id'],
+        },
+        tooltipText: 'sort',
+      },
+      {
+        dataField: 'other_cases',
+        header: 'Matching Cases',
+        display: false,
+        tooltipText: 'sort',
+        role: cellTypes.DISPLAY,
+      },
+      {
+        dataField: 'study_code',
+        header: 'Study Code',
+        cellType: cellTypes.LINK,
+        linkAttr: {
+          rootPath: '/study',
+          pathParams: ['study_code'],
+        },
+        display: true,
+        tooltipText: 'sort',
+        role: cellTypes.DISPLAY,
+      },
+      {
+        dataField: 'study_type',
+        header: 'Study Type',
+        display: true,
+        tooltipText: 'sort',
+        role: cellTypes.DISPLAY,
+      },
+      {
+        dataField: 'breed',
+        header: 'Breed',
+        display: true,
+        role: cellTypes.DISPLAY,
+        tooltipText: 'sort',
+      },
+      {
+        dataField: 'diagnosis',
+        header: 'Diagnosis',
+        display: true,
+        role: cellTypes.DISPLAY,
+        tooltipText: 'sort',
+      },
+      {
+        dataField: 'stage_of_disease',
+        header: 'Stage Of Disease',
+        display: true,
+        role: cellTypes.DISPLAY,
+        tooltipText: 'sort',
+      },
+      {
+        dataField: 'age',
+        header: 'Age',
+        display: true,
+        role: cellTypes.DISPLAY,
+        tooltipText: 'sort',
+      },
+      {
+        dataField: 'sex',
+        header: 'Sex',
+        display: true,
+        role: cellTypes.DISPLAY,
+        tooltipText: 'sort',
+      },
+      {
+        dataField: 'neutered_status',
+        header: 'Neutered Status',
+        display: true,
+        role: cellTypes.DISPLAY,
+        tooltipText: 'sort',
+      },
+      {
+        dataField: 'weight',
+        header: 'Weight (kg)',
+        display: true,
+        role: cellTypes.DISPLAY,
+        tooltipText: 'sort',
+      },
+      {
+        dataField: 'response_to_treatment',
+        header: 'Response to Treatment',
+        display: true,
+        role: cellTypes.DISPLAY,
+        tooltipText: 'sort',
+      },
+      {
+        dataField: 'cohort',
+        header: 'Cohort',
+        display: true,
+        role: cellTypes.DISPLAY,
+        tooltipText: 'sort',
+      },
+    ],
+    id: 'case_tab',
+    tableID: 'case_tab_table',
+    tabIndex: '0',
+    tableMsg: {
+      noMatch: 'No Matching Records Found',
+    },
+    // Add selected files (orange button)
+    // additional query variable specific to tab case
+    queryParam: {
+      file_level: ['case'],
+    },
+    addFilesRequestVariableKey: 'case_ids',
+    addFilesResponseKeys: ['fileOverview', 'file_uuid'],
+    addAllFilesResponseKeys: ['fileOverview', 'file_uuid'],
+    addAllFileQuery: GET_ALL_FILEIDS_FILESTAB_FOR_SELECT_ALL,
+    addSelectedFilesQuery: GET_ALL_FILEIDS_FILESTAB_FOR_SELECT_ALL,
+    addFilesTooltopConfig: {
+      ...baseToolTipConfig,
+      ...addFileTooltipText.case,
+    },
+  },
+  {
+    name: 'Samples',
+    title: 'samples',
+    dataField: 'dataSample',
+    api: GET_SAMPLES_OVERVIEW_QUERY,
+    selectAllButtonText: 'Add Files for All Samples',
+    selectedButtonText: 'Add Files for Selected Sample',
+    count: 'numberOfSamples',
+    paginationAPIField: 'sampleOverview',
+    dataKey: 'sample_id',
+    defaultSortField: 'sample_id',
+    defaultSortDirection: 'asc',
+    searchTextRequestKey: 'sample_ids',
+    searchTextResultKey: 'sampleIds',
+    extendedViewConfig: {
+      searchInput: true,
+      pagination: true,
+      download: {
+        customDownload: true,
+        downloadCsv: 'Download Table Contents As CSV',
+        ...customSamplesTabDownloadCSV,
+      },
+      manageViewColumns: {
+        title: 'View Columns',
+      },
+    },
+    columns: [
+      {
+        cellType: cellTypes.CHECKBOX,
+        display: true,
+        role: cellTypes.CHECKBOX,
+      },
+      {
+        dataField: 'sample_id',
+        header: 'Sample ID',
+        display: true,
+        role: cellTypes.DISPLAY,
+        tooltipText: 'sort',
+      },
+      {
+        dataField: 'case_id',
+        header: 'Case ID',
+        cellType: cellTypes.LINK,
+        linkAttr: {
+          rootPath: '/case',
+          pathParams: ['case_id'],
+        },
+        display: true,
+        viewColumns: false,
+        tooltipText: 'sort',
+      },
+      {
+        dataField: 'breed',
+        header: 'Breed',
+        display: true,
+        role: cellTypes.DISPLAY,
+        tooltipText: 'sort',
+      },
+      {
+        dataField: 'diagnosis',
+        header: 'Diagnosis',
+        display: true,
+        role: cellTypes.DISPLAY,
+        tooltipText: 'sort',
+      },
+      {
+        dataField: 'sample_site',
+        header: 'Sample Site',
+        display: true,
+        role: cellTypes.DISPLAY,
+        tooltipText: 'sort',
+      },
+      {
+        dataField: 'sample_type',
+        header: 'Sample Type',
+        display: true,
+        role: cellTypes.DISPLAY,
+        tooltipText: 'sort',
+      },
+      {
+        dataField: 'sample_pathology',
+        header: 'Pathology/Morphology',
+        display: true,
+        role: cellTypes.DISPLAY,
+        tooltipText: 'sort',
+      },
+      {
+        dataField: 'tumor_grade',
+        header: 'Tumor Grade',
+        display: true,
+        role: cellTypes.DISPLAY,
+        tooltipText: 'sort',
+      },
+      {
+        dataField: 'sample_chronology',
+        header: 'Sample Chronology',
+        display: true,
+        role: cellTypes.DISPLAY,
+        tooltipText: 'sort',
+      },
+      {
+        dataField: 'percentage_tumor',
+        header: 'Percentage Tumor',
+        display: true,
+        role: cellTypes.DISPLAY,
+        tooltipText: 'sort',
+      },
+      {
+        dataField: 'necropsy_sample',
+        header: 'Necropsy Sample',
+        display: true,
+        role: cellTypes.DISPLAY,
+        tooltipText: 'sort',
+      },
+      {
+        dataField: 'sample_preservation',
+        header: 'Sample Preservation',
+        display: true,
+        role: cellTypes.DISPLAY,
+        tooltipText: 'sort',
+      },
+    ],
+    id: 'sample_tab',
+    tableID: 'sample_tab_table',
+    tabIndex: '1',
+    tableMsg: {
+      noMatch: 'No Matching Records Found',
+    },
+    // Add selected files (orange button)
+    // additional query variable specific to sample tab
+    queryParam: {
+      file_level: ['case'],
+    },
+    addFilesRequestVariableKey: 'sample_ids',
+    addFilesResponseKeys: ['fileOverview', 'file_uuid'],
+    addAllFilesResponseKeys: ['fileOverview', 'file_uuid'],
+    addAllFileQuery: GET_ALL_FILEIDS_SAMPLE_TAB_FOR_SELECT_ALL,
+    addSelectedFilesQuery: GET_ALL_FILEIDS_SAMPLE_TAB_FOR_SELECT_ALL,
+    addFilesTooltopConfig: {
+      ...baseToolTipConfig,
+      ...addFileTooltipText.sample,
+    },
+  },
+  {
+    name: 'Case Files',
+    title: 'caseFiles',
+    dataField: 'dataFile',
+    api: GET_FILES_OVERVIEW_QUERY,
+    selectAllButtonText: 'Add All Files',
+    selectedButtonText: 'Add Selected Files',
+    paginationAPIField: 'fileOverview',
+    defaultSortField: 'file_name',
+    defaultSortDirection: 'asc',
+    count: 'numberOfFiles',
+    dataKey: 'file_name',
+    searchTextRequestKey: 'file_uuids',
+    searchTextResultKey: 'caseFileIds',
+    jbrowse: true,
+    queryParam: {
+      file_level: ['case'],
+    },
+    extendedViewConfig: {
+      searchInput: true,
+      pagination: true,
+      download: {
+        customDownload: true,
+        downloadCsv: 'Download Table Contents As CSV',
+        ...customFilesTabDownloadCSV,
+      },
+      manageViewColumns: {
+        title: 'View Columns',
+      },
+    },
+    columns: [
+      {
+        cellType: cellTypes.CHECKBOX,
+        display: true,
+        role: cellTypes.CHECKBOX,
+      },
+      {
+        dataField: 'file_name',
+        header: 'File Name',
+        display: true,
+        role: cellTypes.DISPLAY,
+        tooltipText: 'sort',
+      },
+      {
+        dataField: 'access_file',
+        header: 'Access',
+        display: true,
+        cellType: cellTypes.CUSTOM_ELEM,
+        documentDownloadProps: {
+          maxFileSize: 12000000,
+          toolTipTextFileDownload: 'Download a copy of this file',
+          toolTipTextFilePreview:
+            'Because of its size and/or format, this file is unavailable for download and must be accessed via the My Files workflow',
+          fileSizeColumn: 'file_size',
+          fileFormatColumn: 'file_format',
+          fileLocationColumn: 'file_uuid',
+          caseIdColumn: 'file_name',
+          iconFilePreview:
+            'https://raw.githubusercontent.com/CBIIT/datacommons-assets/main/bento/images/icons/svgs/DocumentDownloadCloud.svg',
+          iconFileDownload:
+            'https://raw.githubusercontent.com/CBIIT/datacommons-assets/main/bento/images/icons/svgs/DocumentDownloadPDF.svg',
+          iconFileViewer:
+            'https://raw.githubusercontent.com/CBIIT/datacommons-assets/main/icdc/images/svgs/DocumentDownloadBAM.svg',
+        },
+        role: cellTypes.DISPLAY,
+        tooltipText: 'sort',
+      },
+      {
+        dataField: 'file_format',
+        header: 'Format',
+        display: true,
+        role: cellTypes.DISPLAY,
+        tooltipText: 'sort',
+      },
+      {
+        dataField: 'file_type',
+        header: 'File Type',
+        display: true,
+        role: cellTypes.DISPLAY,
+        tooltipText: 'sort',
+      },
+      {
+        dataField: 'file_size',
+        header: 'Size',
+        display: true,
+        dataFormatType: dataFormatTypes.FORMAT_BYTES,
+        cellType: cellTypes.FORMAT_DATA,
+        role: cellTypes.DISPLAY,
+        tooltipText: 'sort',
+      },
+      {
+        dataField: 'association',
+        header: 'Association',
+        display: true,
+        role: cellTypes.DISPLAY,
+        tooltipText: 'sort',
+      },
+      {
+        dataField: 'file_description',
+        header: 'Description',
+        display: true,
+        role: cellTypes.DISPLAY,
+        tooltipText: 'sort',
+      },
+      {
+        dataField: 'sample_id',
+        header: 'Sample ID',
+        display: true,
+        role: cellTypes.DISPLAY,
+        tooltipText: 'sort',
+      },
+      {
+        dataField: 'case_id',
+        header: 'Case ID',
+        cellType: cellTypes.LINK,
+        linkAttr: {
+          rootPath: '/case',
+          pathParams: ['case_id'],
+        },
+        display: true,
+      },
+      {
+        dataField: 'breed',
+        header: 'Breed',
+        display: true,
+        role: cellTypes.DISPLAY,
+        tooltipText: 'sort',
+      },
+      {
+        dataField: 'diagnosis',
+        header: 'Diagnosis',
+        display: true,
+        role: cellTypes.DISPLAY,
+        tooltipText: 'sort',
+      },
+      {
+        dataField: 'file_uuid',
+        header: 'File uuid',
+        primary: true,
+        display: false,
+        role: cellTypes.DISPLAY,
+        tooltipText: 'sort',
+      },
+      {
+        dataField: 'study_code',
+        header: 'Study Code',
+        cellType: cellTypes.LINK,
+        linkAttr: {
+          rootPath: '/study',
+          pathParams: ['study_code'],
+        },
+        display: false,
+        role: cellTypes.DISPLAY,
+        tooltipText: 'sort',
+      },
+    ],
+    id: 'file_tab',
+    tableID: 'file_tab_table',
+    selectableRows: true,
+    tableMsg: {
+      noMatch: 'No Matching Records Found',
+    },
+    addFilesRequestVariableKey: 'file_name',
+    addFilesResponseKeys: ['fileIdsFromFileName', 'file_uuid'],
+    addAllFilesResponseKeys: ['fileOverview', 'file_uuid'],
+    addAllFileQuery: GET_ALL_FILEIDS_FILESTAB_FOR_SELECT_ALL,
+    addSelectedFilesQuery: GET_ALL_FILEIDS_ON_FILESTAB_FOR_SELECT_ALL,
+    addFilesTooltopConfig: {
+      ...baseToolTipConfig,
+      ...addFileTooltipText.caseFiles,
+    },
+  },
+  {
+    name: 'Study Files',
+    title: 'studyFiles',
+    dataField: 'dataStudyFile',
+    api: GET_FILES_OVERVIEW_QUERY,
+    selectAllButtonText: 'Add All Files',
+    selectedButtonText: 'Add Selected Files',
+    paginationAPIField: 'fileOverview',
+    defaultSortField: 'file_name',
+    defaultSortDirection: 'asc',
+    count: 'numberOfStudyFiles',
+    dataKey: 'file_name',
+    searchTextRequestKey: 'file_uuids',
+    searchTextResultKey: 'studyFileIds',
+    queryParam: {
+      file_level: ['study'],
+    },
+    extendedViewConfig: {
+      searchInput: true,
+      pagination: true,
+      download: {
+        customDownload: true,
+        downloadCsv: 'Download Table Contents As CSV',
+        ...customStudyFilesTabDownloadCSV,
+      },
+      manageViewColumns: {
+        title: 'View Columns',
+      },
+    },
+    columns: [
+      {
+        cellType: cellTypes.CHECKBOX,
+        display: true,
+        role: cellTypes.CHECKBOX,
+      },
+      {
+        dataField: 'file_name',
+        header: 'File Name',
+        display: true,
+        role: cellTypes.DISPLAY,
+        tooltipText: 'sort',
+      },
+      {
+        dataField: 'file_uuid',
+        header: 'File uuid',
+        display: false,
+        role: cellTypes.DISPLAY,
+        tooltipText: 'sort',
+      },
+      {
+        dataField: 'file_type',
+        header: 'File Type',
+        display: true,
+        role: cellTypes.DISPLAY,
+        tooltipText: 'sort',
+      },
+      {
+        dataField: 'association',
+        header: 'Association',
+        display: true,
+        role: cellTypes.DISPLAY,
+        tooltipText: 'sort',
+      },
+      {
+        dataField: 'file_description',
+        header: 'Description',
+        display: true,
+        role: cellTypes.DISPLAY,
+        tooltipText: 'sort',
+      },
+      {
+        dataField: 'file_format',
+        header: 'Format',
+        display: true,
+        role: cellTypes.DISPLAY,
+        tooltipText: 'sort',
+      },
+      {
+        dataField: 'file_size',
+        header: 'Size',
+        display: true,
+        role: cellTypes.DISPLAY,
+        tooltipText: 'sort',
+        dataFormatType: dataFormatTypes.FORMAT_BYTES,
+        cellType: cellTypes.FORMAT_DATA,
+      },
+      {
+        dataField: 'access_file',
+        header: 'Access',
+        cellType: cellTypes.CUSTOM_ELEM,
+        tooltipText: 'sort',
+        display: true,
+        downloadDocument: true,
+        documentDownloadProps: {
+          maxFileSize: 12000000,
+          toolTipTextFileDownload: 'Download a copy of this file',
+          toolTipTextFilePreview:
+            'Because of its size and/or format, this file is unavailable for download and must be accessed via the My Files workflow',
+          fileSizeColumn: 'file_size',
+          fileFormatColumn: 'file_format',
+          fileLocationColumn: 'file_uuid',
+          caseIdColumn: 'file_name',
+          iconFilePreview:
+            'https://raw.githubusercontent.com/CBIIT/datacommons-assets/main/bento/images/icons/svgs/DocumentDownloadCloud.svg',
+          iconFileDownload:
+            'https://raw.githubusercontent.com/CBIIT/datacommons-assets/main/bento/images/icons/svgs/DocumentDownloadPDF.svg',
+          iconFileViewer:
+            'https://raw.githubusercontent.com/CBIIT/datacommons-assets/main/icdc/images/svgs/DocumentDownloadBAM.svg',
+        },
+      },
+      {
+        dataField: 'study_code',
+        header: 'Study Code',
+        cellType: cellTypes.LINK,
+        linkAttr: {
+          rootPath: '/study',
+          pathParams: ['study_code'],
+        },
+        display: true,
+        role: cellTypes.DISPLAY,
+        tooltipText: 'sort',
+      },
+    ],
+    tableMsg: {
+      noMatch: 'No Matching Records Found',
+    },
+    id: 'study_file_tab',
+    addSlectedFileButtonLabel: '',
+    addFilesRequestVariableKey: 'file_name',
+    addFilesResponseKeys: ['fileIdsFromFileName', 'file_uuid'],
+    addAllFilesResponseKeys: ['fileOverview', 'file_uuid'],
+    addAllFileQuery: GET_ALL_FILEIDS_FILESTAB_FOR_SELECT_ALL,
+    addSelectedFilesQuery: GET_ALL_FILEIDS_ON_FILESTAB_FOR_SELECT_ALL,
+    addFilesTooltopConfig: {
+      ...baseToolTipConfig,
+      ...addFileTooltipText.studyFiles,
+    },
+  },
+];
+
+export const alertMessage =
+  'The cart is limited to 1000 files. Please narrow the search criteria or remove some files from the cart to add more.';
+
+export const tableLayOut = [
+  {
+    container: 'paginatedTable',
+    paginatedTable: true,
+  },
+];
